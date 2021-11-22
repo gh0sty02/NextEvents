@@ -8,8 +8,8 @@ import ArrowRightIcon from "../../components/icons/arrow-right-icon";
 import IEvent from "../../interfaces/event.interface";
 import Button from "../ui/button";
 
-const EventItem: React.FC<IEvent> = (props) => {
-  const { title, image, date, location, id } = props;
+const EventItem: React.FC<IEvent> = ({ title, image, date, location, id }) => {
+  // const { title, image, date, location, id } = props;
 
   const humanReadableDate = new Date(date).toLocaleDateString("en-US", {
     day: "numeric",

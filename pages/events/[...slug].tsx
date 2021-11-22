@@ -1,18 +1,70 @@
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
 import ErrorAlert from "../../components/events/error-alert";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
+import { getFilteredEvents } from "../../components/helper/api-utils";
 import Button from "../../components/ui/button";
-import { getFilteredEvents } from "../../dummyData";
+import IEvent from "../../interfaces/event.interface";
 
-const FilteredEvents = () => {
-  const router = useRouter();
+interface IProps {
+  hasError: boolean;
+  filteredEvents?: IEvent[];
+  date?: {
+    year: number;
+    month: number;
+  };
+}
 
-  const filteredData: string[] = router.query?.slug;
+const FilteredEvents: React.FC<IProps> = ({
+  hasError,
+  filteredEvents,
+  date,
+}) => {
+  if (hasError) {
+    return (
+      <Fragment>
+        <ErrorAlert>
+          <p>Invalid filter, Please adjust the values</p>
+        </ErrorAlert>
+        <div className="center">
+          <Button link="/events">Show All Events</Button>
+        </div>
+      </Fragment>
+    );
+  }
 
-  if (!filteredData) {
-    return <p className="center">Loading...</p>;
+  let eventDate;
+  if (date) {
+    eventDate = new Date(date?.year, date?.month - 1);
+  }
+
+  return (
+    <Fragment>
+      <ResultsTitle date={eventDate} />
+      {!FilteredEvents ||
+        (filteredEvents?.length == 0 && (
+          <Fragment>
+            <ErrorAlert>
+              <p>No Events Found</p>
+            </ErrorAlert>
+            <div className="center">
+              <Button link="/events">Show all events</Button>
+            </div>
+          </Fragment>
+        ))}
+      {filteredEvents && <EventList items={filteredEvents} />}
+    </Fragment>
+  );
+};
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { params } = context;
+
+  let filteredData: string[];
+  if (params?.slug && Array.isArray(params?.slug)) {
+    filteredData = params?.slug;
   }
 
   const [year, month] = filteredData;
@@ -28,42 +80,24 @@ const FilteredEvents = () => {
     numMonth < 1 ||
     numMonth > 12
   ) {
-    console.log(numYear, numMonth);
-    return (
-      <Fragment>
-        <ErrorAlert>
-          <p>Invalid filter, Please adjust the values</p>
-        </ErrorAlert>
-        <div className="center">
-          <Button link="/events">Show All Events</Button>
-        </div>
-      </Fragment>
-    );
+    return {
+      props: {
+        hasErrors: true,
+      },
+    };
   }
 
-  const filteredEvents = getFilteredEvents(numYear, numMonth);
+  const filteredEvents = await getFilteredEvents({ numYear, numMonth });
 
-  console.log(filteredEvents);
-
-  const date = new Date(numYear, numMonth - 1);
-
-  return (
-    <Fragment>
-      <ResultsTitle date={date} />
-      {!FilteredEvents ||
-        (filteredEvents.length == 0 && (
-          <Fragment>
-            <ErrorAlert>
-              <p>No Events Found</p>
-            </ErrorAlert>
-            <div className="center">
-              <Button link="/events">Show all events</Button>
-            </div>
-          </Fragment>
-        ))}
-      {filteredEvents && <EventList items={filteredEvents} />}
-    </Fragment>
-  );
-};
+  return {
+    props: {
+      filteredEvents,
+      date: {
+        year: numYear,
+        month: numMonth,
+      },
+    },
+  };
+}
 
 export default FilteredEvents;

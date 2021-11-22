@@ -14,6 +14,7 @@ const EventList: React.FC<{ items: IEvent[] }> = ({ items }) => {
           location={event.location}
           date={event.date}
           image={event.image}
+          isFeatured={event.isFeatured}
         />
       ))}
     </ul>
