@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import AddressIcon from "../icons/address-icon";
 import DateIcon from "../icons/date-icon";
 import LogisticsItem from "./logistics-item";
@@ -24,7 +26,7 @@ const EventLogistics: React.FC<IProps> = (props) => {
     <section className={classes.logistics}>
       <div className={classes.image}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`/${image}`} alt={imageAlt} />
+        <Image width={300} height={300} src={`/${image}`} alt={imageAlt} />
       </div>
       <ul className={classes.list}>
         <LogisticsItem icon={DateIcon}>

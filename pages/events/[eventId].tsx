@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import useSWR from "swr";
 
 import EventSummary from "../../components/event-details/event-summary";
@@ -13,6 +13,9 @@ import {
   getEventById,
   getFeaturedEvents,
 } from "../../components/helper/api-utils";
+import Head from "next/head";
+
+import Comments from "../../components/input/comments";
 
 interface IEvent {
   date: string;
@@ -27,7 +30,7 @@ interface IEvent {
 const EventDetailPage: React.FC<{ event: IEvent }> = ({ event }) => {
   const router = useRouter();
 
-  const { eventId } = router.query;
+  const id = router.query.eventId;
 
   if (!event) {
     return (
@@ -44,6 +47,10 @@ const EventDetailPage: React.FC<{ event: IEvent }> = ({ event }) => {
 
   return (
     <Fragment>
+      <Head>
+        <title>{event.title}</title>
+        <meta name="description" content={event.description} />
+      </Head>
       <EventSummary title={event.title} />
       <EventLogistics
         date={event.date}
@@ -54,6 +61,7 @@ const EventDetailPage: React.FC<{ event: IEvent }> = ({ event }) => {
       <EventContent>
         <p>{event.description}</p>
       </EventContent>
+      {<Comments eventId={id} />}
     </Fragment>
   );
 };

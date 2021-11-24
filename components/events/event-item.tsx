@@ -23,8 +23,7 @@ const EventItem: React.FC<IEvent> = ({ title, image, date, location, id }) => {
 
   return (
     <li className={classes.item}>
-      {/*  eslint-disable-next-line @next/next/no-img-element  */}
-      <img src={"/" + image} alt={title} />
+      <Image src={"/" + image} alt={title} height={160} width={250} />
       <div className={classes.content}>
         <div className={classes.summary}>
           <h2>{title}</h2>

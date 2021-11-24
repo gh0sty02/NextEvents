@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import ErrorAlert from "../../components/events/error-alert";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
@@ -22,9 +23,20 @@ const FilteredEvents: React.FC<IProps> = ({
   filteredEvents,
   date,
 }) => {
+  const pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`Events for ${date?.month}/${date?.year}`}
+      />
+    </Head>
+  );
+
   if (hasError) {
     return (
       <Fragment>
+        {pageHeadData}
         <ErrorAlert>
           <p>Invalid filter, Please adjust the values</p>
         </ErrorAlert>
@@ -42,6 +54,7 @@ const FilteredEvents: React.FC<IProps> = ({
 
   return (
     <Fragment>
+      {pageHeadData}
       <ResultsTitle date={eventDate} />
       {!FilteredEvents ||
         (filteredEvents?.length == 0 && (
@@ -49,20 +62,20 @@ const FilteredEvents: React.FC<IProps> = ({
             <ErrorAlert>
               <p>No Events Found</p>
             </ErrorAlert>
-            <div className="center">
-              <Button link="/events">Show all events</Button>
-            </div>
           </Fragment>
         ))}
+      <div className="center">
+        <Button link="/events">Show all events</Button>
+      </div>
       {filteredEvents && <EventList items={filteredEvents} />}
     </Fragment>
   );
 };
+let filteredData: string[];
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { params } = context;
 
-  let filteredData: string[];
   if (params?.slug && Array.isArray(params?.slug)) {
     filteredData = params?.slug;
   }
