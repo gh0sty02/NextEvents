@@ -5,7 +5,7 @@ import React, { Fragment } from "react";
 import ErrorAlert from "../../components/events/error-alert";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
-import { getFilteredEvents } from "../../components/helper/api-utils";
+import { getFilteredEvents } from "../../helper/api-utils";
 import Button from "../../components/ui/button";
 import IEvent from "../../interfaces/event.interface";
 

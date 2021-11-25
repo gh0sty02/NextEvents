@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import CommentList from "./comment-list";
 import NewComment from "./new-comment";
 import classes from "./comments.module.css";
+import { NotificationContext } from "../../store/notification-context";
 
 interface IProps {
   eventId: string | string[] | undefined;
@@ -11,18 +12,22 @@ interface IProps {
 function Comments({ eventId }: IProps) {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] =
-    useState<[{ id: string; text: string; name: string }]>();
+    useState<[{ _id: string; text: string; name: string }]>();
+  const [isFetchingComments, setIsFetchingComments] = useState(false);
+
+  const notificationCtx = useContext(NotificationContext);
 
   useEffect(() => {
     if (showComments) {
+      setIsFetchingComments(true);
       fetch("/api/comments/" + eventId)
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setComments(data.comments);
+          setIsFetchingComments(false);
         });
     }
-  }, [showComments, eventId]);
+  }, [showComments]);
 
   function toggleCommentsHandler() {
     setShowComments((prevStatus) => !prevStatus);
@@ -34,7 +39,12 @@ function Comments({ eventId }: IProps) {
     name: string;
   }) {
     // send data to API
-    console.log(`/api/comments/${eventId}`);
+    notificationCtx?.showNotification({
+      title: "Adding...",
+      message: "Adding Comment to the Event",
+      status: "pending",
+    });
+
     fetch(`/api/comments/${eventId}`, {
       method: "POST",
       headers: {
@@ -42,8 +52,29 @@ function Comments({ eventId }: IProps) {
       },
       body: JSON.stringify(commentData),
     })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            throw new Error(data.message || "Something went wrong");
+          });
+        }
+      })
+      .then((data) => {
+        notificationCtx?.showNotification({
+          title: "Success",
+          message: "Successfully Added the Comment",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        notificationCtx?.showNotification({
+          title: "Error",
+          message: err.message || "Something went wrong",
+          status: "error",
+        });
+      });
   }
 
   return (
@@ -52,7 +83,10 @@ function Comments({ eventId }: IProps) {
         {showComments ? "Hide" : "Show"} Comments
       </button>
       {showComments && <NewComment onAddComment={addCommentHandler} />}
-      {showComments && comments && <CommentList items={comments} />}
+      {showComments && isFetchingComments && <p>Loading..</p>}
+      {showComments && !isFetchingComments && comments && (
+        <CommentList items={comments} />
+      )}
     </section>
   );
 }

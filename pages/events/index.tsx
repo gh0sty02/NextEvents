@@ -3,7 +3,7 @@ import EventList from "../../components/events/event-list";
 import EventsSearch from "../../components/events/events-search";
 import { useRouter } from "next/router";
 import IEvent from "../../interfaces/event.interface";
-import { getAllEvents } from "../../components/helper/api-utils";
+import { getAllEvents } from "../../helper/api-utils";
 import Head from "next/head";
 
 const EventsPage: React.FC<{ events: IEvent[] }> = ({ events }) => {

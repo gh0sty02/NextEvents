@@ -9,10 +9,7 @@ import image from "next/image";
 import ErrorAlert from "../../components/events/error-alert";
 import Button from "../../components/ui/button";
 import { GetStaticPathsContext, GetStaticPropsContext } from "next";
-import {
-  getEventById,
-  getFeaturedEvents,
-} from "../../components/helper/api-utils";
+import { getEventById, getFeaturedEvents } from "../../helper/api-utils";
 import Head from "next/head";
 
 import Comments from "../../components/input/comments";
